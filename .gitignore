@@ -131,6 +131,9 @@ dmypy.json
 # IDE
 .vscode/
 
+# Etc
+.history/
+
 # System
 .DS_Store
 Thumbs.db
