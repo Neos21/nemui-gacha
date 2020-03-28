@@ -1,7 +1,11 @@
+import subprocess
+
 import MeCab
 
-# echo "$(mecab-config --dicdir)/mecab-ipadic-neologd"
-mecab = MeCab.Tagger('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
+# mecab-ipadic-neologd 辞書を指定して MeCab を準備する
+dic_dir = subprocess.check_output('mecab-config --dicdir', shell = True).decode('utf-8').strip()
+option = '-d ' + dic_dir + '/mecab-ipadic-neologd'
+mecab = MeCab.Tagger(option)
 
 # MeCab でパースする
 def parse_mecab(input):
@@ -28,7 +32,7 @@ def make_replaces(parsed):
     pos         = node[1]  # 品詞
     pos_type_1  = node[2]  # 品詞細分類1
     conjugation = node[5]  # 活用型
-    print('[DEBUG]', index, real_index, surface, pos, raw_node)
+    #print('[DEBUG]', index, real_index, surface, pos, raw_node)
     
     if pos == '形容詞':
       characters = list(surface)
@@ -51,7 +55,7 @@ def make_replaces(parsed):
         characters[-1] = characters[-1].translate(str.maketrans({ 'う':'わ', 'く':'か', 'す':'さ', 'つ':'た', 'ぬ':'な', 'ふ':'は', 'む':'ま', 'ゆ':'や', 'る':'ら' })) + 'ない'
         replaces.append({ 'index': real_index, 'word': ''.join(characters) })
       else:
-        print('[DEBUG] 動詞 未処理')  # 到達しない想定
+        pass  #print('[DEBUG] 動詞 未処理')  # 到達しない想定
       
       break
     
@@ -68,7 +72,7 @@ def make_replaces(parsed):
         elif prev_surface[-1] == 'い':
           replaces.append({ 'index': real_index, 'word': 'てない' })
         else:
-          print('[DEBUG] 助動詞「た」未処理系')  # FIXME : 「眠かった」→形容詞「眠かっ」などがヒットする
+          pass  #print('[DEBUG] 助動詞「た」未処理系')  # FIXME : 「眠かった」→形容詞「眠かっ」などがヒットする
       elif surface == 'たい':
         replaces.append({ 'index': real_index, 'word': 'たくない' })
       elif surface == 'ない':
@@ -88,7 +92,7 @@ def make_replaces(parsed):
       if pos_type_1 in ['一般', '固有名詞', '接尾']:
         replaces.append({ 'index': real_index, 'word': surface + 'じゃない' })
       elif pos == '名詞':
-        print('[DEBUG] 名詞 不完全処理系')  # FIXME : 「課金」→「課金しない」と変換しているが、肯定形で返す時は「課金する」と答えたい
+        #print('[DEBUG] 名詞 不完全処理系')  # FIXME : 「課金」→「課金しない」と変換しているが、肯定形で返す時は「課金する」と答えたい
         replaces.append({ 'index': real_index, 'word': surface + 'しない' })
       
       break
