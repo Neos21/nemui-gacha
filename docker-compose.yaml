@@ -1,0 +1,7 @@
+nemui-gacha:
+  build: ./
+  container_name: nemui-gacha
+  tty: true
+  volumes:
+    - ./:/root/project/
+  working_dir: /root/project/
